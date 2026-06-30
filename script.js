@@ -249,3 +249,97 @@ const startBtn = document.getElementById('startBtn');
 
     ctx.restore();
   }
+
+  const OB_EMOJI_LIST = [
+    '☠','😺','🐵','🗣','👤','👥','👯‍♀️','👨‍❤️‍💋‍👨','👨‍👩‍👦','👨‍👩‍👦‍👦','👪','👨‍👩‍👧👦','👨‍👩‍👧','👨‍👩‍👧','👨‍👨‍👦','👨‍👨‍👧','👨‍👨‍👦','👨‍👨‍👦','👨‍👨‍👧','👦','👩‍👦','👨‍👦','👨‍👧','👭','👫','👩👨','🧑','🧒','👴','👩‍🦰','👨‍🦱','👩‍🦳','🤴','🚴‍♀️','🚴‍♂️','🏇','🏃‍♀️','🏃‍♂️','👩‍🦯','👨‍🦯','👩‍🦼','👨‍🦼'
+  ];
+
+  function pickObstacleEmoji() {
+    return OB_EMOJI_LIST[Math.floor(Math.random() * OB_EMOJI_LIST.length)];
+  }
+
+  function drawObstacles() {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const ob of state.world.obstacles) {
+      const { x, y } = ob;
+      ctx.font = `${Math.max(26, Math.min(54, ob.w))}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+
+      const emoji = ob.emoji;
+
+      // subtle shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillText(emoji, x + 3, y + 5);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.98)';
+      ctx.fillText(emoji, x, y);
+    }
+  }
+
+  function update(dt) {
+    const c = state.car;
+    if (!state.started) return;
+
+    // UP/DOWN control forward speed (car auto-moves forward)
+    if (state.keys.up) state.world.speed = Math.min(c.maxSpeed, state.world.speed + c.accel * dt * 2.1);
+    if (state.keys.down) state.world.speed = Math.max(c.minSpeed, state.world.speed - c.decel * dt * 2.1);
+    // LEFT/RIGHT steer laterally
+    if (state.keys.left) c.vx -= c.lateralAccel * dt * 4.2;
+    if (state.keys.right) c.vx += c.lateralAccel * dt * 4.2;
+
+    c.vx *= Math.pow(c.lateralFriction, dt);
+
+    // move horizontally only (forward is obstacle motion)
+    c.x += c.vx * dt * 60;
+
+    // angle based on steering
+    const targetAngle = clamp(c.vx * c.steerAmount, -0.35, 0.35);
+    c.angle += (targetAngle - c.angle) * (1 - Math.pow(0.001, dt));
+
+    // world + obstacles
+    state.world.spawnTimer += dt;
+    if (state.world.spawnTimer >= state.world.spawnEvery) {
+      state.world.spawnTimer = 0;
+      spawnObstacle();
+    }
+
+    // speed scaling with score
+    state.world.speed = clamp(state.world.speed + Math.floor(state.score / state.world.speedGainEvery) * state.world.speedGain * dt * 0.01, c.minSpeed, c.maxSpeed);
+
+    const speed = state.world.speed;
+
+    // Move obstacles
+    for (const ob of state.world.obstacles) {
+      ob.y += ob.speed * dt * speed * 10;
+    }
+    // Remove offscreen
+    state.world.obstacles = state.world.obstacles.filter(o => o.y - o.h/2 < H + 80);
+
+    // Collision (AABB)
+    const halfW = c.w / 2;
+    const pad = 12;
+    const minX = pad + halfW;
+    const maxX = W - pad - halfW;
+
+    let hit = false;
+    // Edge collision
+    if (c.x < minX) { c.x = minX; hit = true; }
+    if (c.x > maxX) { c.x = maxX; hit = true; }
+
+    // Obstacle collision
+    const carBox = {
+      left: c.x - c.w/2,
+      right: c.x + c.w/2,
+      top: c.y - c.h/2,
+      bottom: c.y + c.h/2,
+    };
+
+    for (const ob of state.world.obstacles) {
+      const oLeft = ob.x - ob.w/2;
+      const oRight = ob.x + ob.w/2;
+      const oTop = ob.y - ob.h/2;
+      const oBottom = ob.y + ob.h/2;
+
+      const overlap = !(carBox.right < oLeft || carBox.left > oRight || carBox.bottom < oTop || carBox.top > oBottom);
+      if (overlap) { hit = true; break; }
+    }
