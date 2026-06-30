@@ -162,3 +162,115 @@ canvas{
 }
 
 .btn-secondary:hover{background: rgba(247,37,133,.18)}
+
+@media (prefers-reduced-motion: reduce){
+  *{scroll-behavior:auto}
+}
+
+/* HOW TO PLAY floating help */
+.howto-fab{
+  position:fixed;
+  top:25%;
+  left:2%;
+  z-index:60;
+  appearance:none;
+  border:none;
+  cursor:pointer;
+  padding:12px 14px;
+  border-radius:999px;
+  font-weight:900;
+  letter-spacing:.2px;
+  background:rgba(76,201,240,.18);
+  border:1px solid rgba(76,201,240,.35);
+  color:var(--text);
+  box-shadow: 0 16px 50px rgba(0,0,0,.35);
+}
+.howto-fab:hover{background:rgba(76,201,240,.26)}
+.howto-fab:active{transform:translateY(1px)}
+
+.howto-overlay{
+  position:fixed;
+  inset:0;
+  z-index:80;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+}
+
+.howto-card{
+  width:min(560px, 92vw);
+  background: rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  box-shadow: var(--shadow);
+  padding:18px 18px 16px;
+  position:relative;
+}
+
+.howto-close{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.07);
+  cursor:pointer;
+  color:var(--text);
+  font-weight:900;
+}
+.howto-close:hover{background: rgba(255,255,255,.11)}
+.howto-title{
+  font-weight:900;
+  font-size:18px;
+  margin:0 36px 10px 0;
+}
+.howto-text{
+  color:var(--muted);
+  line-height:1.45;
+  font-size:14px;
+}
+.howto-text b{color:var(--text)}
+
+/* On-screen left/right buttons */
+.side-arrows{
+  position:fixed;
+  top:70%;
+  transform:translateY(-50%);
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none; /* allow only the buttons themselves */
+}
+
+.side-arrows.left{left:14px;}
+.side-arrows.right{right:14px;}
+
+.arrow-btn{
+  pointer-events:auto;
+  width:70px;
+  height:50px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.07);
+  color:var(--text);
+  box-shadow: 0 14px 40px rgba(0,0,0,.35);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(8px);
+  transition: transform .05s ease, background .15s ease;
+  font-size:22px;
+  font-weight:900;
+}
+
+.arrow-btn:hover{background:rgba(255,255,255,.11)}
+.arrow-btn:active{transform:translateY(1px)}
