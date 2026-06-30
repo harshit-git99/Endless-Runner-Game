@@ -1,1 +1,4 @@
-
+# Avoid The Crowd - Endless Runner Game
+# Built using HTML, CSS, and JavaScript only
+# No external dependencies required
+# Just click on the link and enjoy the game.
