@@ -124,3 +124,41 @@ canvas{
 }
 
 .overlay-text.small{font-size:12.5px}
+
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:10px 14px;
+  background: var(--panel);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  color:var(--muted);
+}
+
+.note{font-size:13px}
+
+.btn{
+  appearance:none;
+  border:none;
+  cursor:pointer;
+  padding:10px 14px;
+  border-radius:12px;
+  background: rgba(76,201,240,.15);
+  color:var(--text);
+  font-weight:700;
+  border:1px solid rgba(76,201,240,.35);
+  transition: transform .05s ease, background .15s ease;
+}
+
+.btn:hover{background: rgba(76,201,240,.22)}
+.btn:active{transform: translateY(1px)}
+
+.btn-secondary{
+  background: rgba(247,37,133,.12);
+  border-color: rgba(247,37,133,.35);
+}
+
+.btn-secondary:hover{background: rgba(247,37,133,.18)}
