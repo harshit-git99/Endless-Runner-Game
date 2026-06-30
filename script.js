@@ -343,3 +343,111 @@ const startBtn = document.getElementById('startBtn');
       const overlap = !(carBox.right < oLeft || carBox.left > oRight || carBox.bottom < oTop || carBox.top > oBottom);
       if (overlap) { hit = true; break; }
     }
+
+    // Score increases with forward speed and time
+    state.score += speed * dt * 6;
+    scoreEl.textContent = String(Math.floor(state.score));
+
+    // Game over
+    if (hit) gameOver();
+  }
+
+  function spawnObstacle() {
+    // obstacle is a small car / box coming from top to bottom
+    const laneMargin = 18;
+    const xMin = 12 + (state.world.obstacles.length % 2 === 0 ? 0 : 0);
+    const xMax = W - 12;
+
+    // keep obstacle slightly away from edges
+    const x = Math.random() * (xMax - xMin - laneMargin) + xMin + laneMargin;
+    const size = 28 + Math.random() * 22;
+
+    state.world.obstacles.push({
+      x,
+      y: -80,
+      w: size * 0.9,
+      h: size,
+      speed: 1 + Math.random() * 0.9,
+      emoji: pickObstacleEmoji(),
+    });
+  }
+
+  function gameOver() {
+    state.started = false;
+    overlay.classList.remove('hidden');
+    const finalScore = Math.floor(state.score);
+    state.score = 0;
+
+
+    if (finalScore > state.best) {
+      state.best = finalScore;
+      localStorage.setItem('car_game_best', String(state.best));
+      bestEl.textContent = String(state.best);
+    }
+
+    overlay.querySelector('.overlay-title').textContent = 'Game Over';
+    overlay.querySelectorAll('.overlay-text')[0].innerHTML = `Score: <b>${finalScore}</b>. Press <b>Space</b> to restart.`;
+  }
+
+  function loop(ts) {
+    if (!state.lastTs) state.lastTs = ts;
+    const dt = clamp((ts - state.lastTs) / 16.6667, 0.2, 2); // normalize around 60fps
+    state.lastTs = ts;
+
+    drawBackground();
+    update(dt);
+    drawObstacles();
+    drawCar();
+
+
+    // If not started, show the default overlay content.
+    if (!state.started) {
+      overlay.querySelector('.overlay-title').textContent = 'Press "SPACE" or "Start" button to Start.';
+      overlay.querySelectorAll('.overlay-text')[0].innerHTML = 'Press arrow keys for moving.';
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  // Start with overlay visible.
+  overlay.classList.remove('hidden');
+
+  // Minimal polyfill for hidden (since CSS may not include it)
+  const style = document.createElement('style');
+  style.textContent = `.hidden{display:none !important;}`;
+  document.head.appendChild(style);
+
+  function resizeCanvasForOrientation() {
+    // Desired internal resolutions:
+    // - Landscape: 600x400
+    // - Portrait:  400x600
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const targetW = isPortrait ? 400 : 600;
+    const targetH = isPortrait ? 600 : 400;
+
+    // Only resize when needed (avoid resetting gameplay constantly)
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+      W = canvas.width;
+      H = canvas.height;
+
+      // Re-align game entities to the new dimensions.
+      // Simpler + more reliable than trying to scale state mid-run.
+      resetGame();
+    }
+  }
+
+  // Handle initial layout + future orientation changes.
+  window.addEventListener('resize', () => {
+    // Debounce via rAF tick.
+    if (resizeCanvasForOrientation._raf) cancelAnimationFrame(resizeCanvasForOrientation._raf);
+    resizeCanvasForOrientation._raf = requestAnimationFrame(resizeCanvasForOrientation);
+  });
+
+  resizeCanvasForOrientation();
+
+  requestAnimationFrame(loop);
+
+  resetGame();
+})();
