@@ -61,3 +61,40 @@ body{
   font-size:14px;
   color:var(--muted);
 }
+
+.stage{
+  position:relative;
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:10px;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+  border-radius:16px;
+  border:1px dashed rgba(255,255,255,.14);
+}
+
+canvas{
+  /* JS controls the internal drawing resolution (600x400 / 400x600). */
+  /* CSS only scales it responsively without stretching the bitmap. */
+  display:block;
+  width:100%;
+  height:auto;
+  max-width:900px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.12);
+  background: radial-gradient(900px 600px at 50% 40%, rgba(76,201,240,.12), transparent 60%),
+              linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background: rgba(0,0,0,.25);
+  backdrop-filter: blur(6px);
+}
+
