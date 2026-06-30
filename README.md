@@ -1,4 +1,4 @@
-# Avoid The Crowd 🎮
+# Avoid The Crowd 🤐🎮
 
 **Avoid The Crowd** is an endless runner game built using **HTML, CSS, and JavaScript only**. The goal of the game is simple — keep moving forward, avoid randomly generated obstacles, and survive as long as possible to achieve a higher score.
 
