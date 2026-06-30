@@ -30,3 +30,34 @@ body{
   gap:12px;
 }
 
+.hud{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  box-shadow: var(--shadow);
+}
+
+.title{
+  font-weight:800;
+  letter-spacing:.2px;
+  font-size:18px;
+}
+
+.hint{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.stats{
+  display:flex;
+  gap:14px;
+  align-items:baseline;
+  font-size:14px;
+  color:var(--muted);
+}
