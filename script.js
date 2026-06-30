@@ -102,3 +102,150 @@ const startBtn = document.getElementById('startBtn');
     else if (k === 'a') state.keys.left = down;
     else if (k === 'd') state.keys.right = down;
   }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      if (!state.started) startGame();
+      e.preventDefault();
+      return;
+    }
+
+    onKey(e, true);
+    // Prevent arrow keys from scrolling the page.
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+
+    if (!state.started) {
+      // Allow driving immediately without extra click if user presses arrows.
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) startGame();
+    }
+  }, { passive: false });
+
+  window.addEventListener('keyup', (e) => {
+    onKey(e, false);
+  });
+
+  function bindHoldButton(btnEl, keyName) {
+    if (!btnEl) return;
+
+    const setDown = (down) => {
+      state.keys[keyName] = down;
+    };
+
+    const onPointerDown = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDown(true);
+      if (!state.started) startGame();
+    };
+
+    const onPointerUp = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDown(false);
+    };
+
+    btnEl.addEventListener('pointerdown', onPointerDown, { passive: false });
+    btnEl.addEventListener('pointerup', onPointerUp, { passive: false });
+    btnEl.addEventListener('pointercancel', onPointerUp, { passive: false });
+    btnEl.addEventListener('pointerleave', onPointerUp, { passive: false });
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (!state.started) startGame();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    resetGame();
+  });
+
+  bindHoldButton(leftBtn, 'left');
+  bindHoldButton(rightBtn, 'right');
+
+  // HOW TO PLAY popup behavior
+  function showHowTo() {
+    if (!howToOverlay) return;
+    howToOverlay.classList.remove('hidden');
+  }
+
+  function hideHowTo() {
+    if (!howToOverlay) return;
+    howToOverlay.classList.add('hidden');
+  }
+
+  if (howToFab) howToFab.addEventListener('click', showHowTo);
+  if (howToClose) howToClose.addEventListener('click', hideHowTo);
+  if (howToOverlay) {
+    howToOverlay.addEventListener('click', (e) => {
+      if (e.target === howToOverlay) hideHowTo();
+    });
+  }
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hideHowTo();
+  });
+
+  function drawBackground() {
+    // subtle grid
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(0, 0, W, H);
+
+    const grid = 30;
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= W; x += grid) {
+      ctx.strokeStyle = x % (grid * 3) === 0 ? 'rgba(76,201,240,0.12)' : 'rgba(255,255,255,0.06)';
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= H; y += grid) {
+      ctx.strokeStyle = y % (grid * 3) === 0 ? 'rgba(247,37,133,0.10)' : 'rgba(255,255,255,0.06)';
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+
+    // border
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(12, 12, W - 24, H - 24);
+
+    // speed lines (forward motion feel)
+    const speed = state.world.speed;
+    const lineCount = 18;
+    for (let i = 0; i < lineCount; i++) {
+      const t = (i / lineCount);
+      const yy = 12 + (H - 24) * (t);
+      const len = 16 + 28 * t;
+      const alpha = 0.08 + 0.12 * (1 - t);
+      ctx.strokeStyle = `rgba(76,201,240,${alpha})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const wobble = Math.sin((state.score * 0.02) + i) * 6;
+      ctx.moveTo(12 + (W - 24) / 2 + wobble, yy);
+      ctx.lineTo(12 + (W - 24) / 2 + wobble, yy + len * (0.4 + speed / 16));
+      ctx.stroke();
+    }
+  }
+
+
+  function drawCar() {
+    const { x, y } = state.car;
+
+    // Render car as an emoji
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '44px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+
+    // subtle shadow/glow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillText('🤐', x + 3, y + 6);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.98)';
+    ctx.fillText('🤐', x, y);
+
+    ctx.restore();
+  }
