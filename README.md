@@ -56,7 +56,7 @@
 ## 🌐 Play Online
 
 You can play **Avoid The Crowd** here:
-(Will be deployed soon,stay tuned.)
+https://avoidthecrowd.vercel.app/
 
 ## 📱 Platform Support
 
